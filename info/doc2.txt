@@ -1,0 +1,15 @@
+Embeddings are dense, fixed-length numerical vectors that represent the semantic meaning of text. Unlike keyword-based search (which matches exact words), embedding-based search captures meaning, so "automobile" and "car" end up close together in vector space even though they share no characters.
+
+To create an embedding, a neural network (the encoder) reads a piece of text and outputs a vector, typically of 384 to 1536 dimensions. Texts with similar meaning produce vectors that are close together according to cosine similarity or Euclidean distance. This property is what makes semantic search possible.
+
+Sentence Transformers (SBERT) are a family of encoder models specifically optimized to produce sentence-level embeddings. The model all-MiniLM-L6-v2 is a popular lightweight choice: it produces 384-dimensional vectors and runs fast on CPU. It was trained using contrastive learning on pairs of similar sentences so that semantically related sentences map to nearby points in the embedding space.
+
+FAISS (Facebook AI Similarity Search) is an open-source library for efficient similarity search over large collections of vectors. It supports multiple index types. The simplest is a flat index (IndexFlatL2), which stores all vectors and does exact brute-force search using L2 (Euclidean) distance. For larger collections, approximate indexes like IVF or HNSW trade a small amount of recall for much faster search.
+
+In a RAG system, FAISS holds the embeddings of all document chunks. When a query arrives, its embedding is computed and passed to FAISS, which returns the indices of the top-k closest vectors. Those indices map back to the original text chunks, which are then used as context for the LLM.
+
+Vector stores like FAISS are why RAG scales: searching a million 384-dimensional vectors takes milliseconds on a modern CPU.
+
+Large Language Models (LLMs) such as GPT-4, Claude, or Grok are transformer-based models trained on vast amounts of text. They excel at understanding instructions and generating coherent, fluent responses. However, they have a knowledge cutoff date and can hallucinate facts. RAG mitigates both problems by supplying verified, up-to-date context at inference time.
+
+The Grok API, provided by xAI, exposes Grok language models via an OpenAI-compatible REST interface. You send a list of messages (system + user) to the /chat/completions endpoint, and the model returns a generated reply. The model grok-3-mini-beta is a reasoning-capable variant that thinks through problems before answering.
