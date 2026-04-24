@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 
+// const EXAMPLES = [
+//   "What is RAG and how does it work?",
+//   "How do embeddings capture meaning?",
+//   "What is FAISS and why is it fast?",
+//   "How does SentenceTransformers work?",
+// ];
 const EXAMPLES = [
-  "What is RAG and how does it work?",
-  "How do embeddings capture meaning?",
-  "What is FAISS and why is it fast?",
-  "How does SentenceTransformers work?",
 ];
-
 async function askQuestion(question) {
   const res = await fetch("/query", {
     method: "POST",
