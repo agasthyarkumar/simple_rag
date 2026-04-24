@@ -1,0 +1,23 @@
+Arrays are one of the most fundamental data structures. They store elements in contiguous memory locations, allowing efficient access using indices.
+
+Time Complexities:
+- Access: O(1)
+- Search: O(n)
+- Insertion (end): O(1) amortized
+- Insertion (middle): O(n)
+- Deletion: O(n)
+
+Advantages:
+- Fast random access
+- Cache-friendly
+
+Disadvantages:
+- Fixed size (in static arrays)
+- Costly insertions/deletions in the middle
+
+Common Problems:
+- Two Sum
+- Maximum Subarray (Kadane's Algorithm)
+- Sliding Window problems
+
+Dynamic arrays (like Python lists) automatically resize when capacity is exceeded.

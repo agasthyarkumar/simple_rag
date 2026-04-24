@@ -1,0 +1,28 @@
+A linked list is a linear data structure where elements (nodes) are connected using pointers.
+
+Each node contains:
+- Data
+- Pointer to the next node
+
+Types of linked lists:
+- Singly linked list
+- Doubly linked list
+- Circular linked list
+
+Time Complexities:
+- Access: O(n)
+- Search: O(n)
+- Insertion: O(1) (if position known)
+- Deletion: O(1) (if position known)
+
+Advantages:
+- Dynamic size
+- Efficient insertions/deletions
+
+Disadvantages:
+- No random access
+- Extra memory for pointers
+
+Common Problems:
+- Reverse a linked list
+- Detect cycle (Floyd’s algorithm)

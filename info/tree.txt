@@ -1,0 +1,25 @@
+A tree is a hierarchical data structure consisting of nodes connected by edges.
+
+Important terms:
+- Root: top node
+- Leaf: node with no children
+- Height: longest path from root to leaf
+
+Binary Tree:
+Each node has at most two children.
+
+Binary Search Tree (BST):
+- Left subtree < root
+- Right subtree > root
+
+Time Complexity (BST average):
+- Search: O(log n)
+- Insert: O(log n)
+- Delete: O(log n)
+
+Worst case (skewed tree): O(n)
+
+Common Problems:
+- Tree traversal (Inorder, Preorder, Postorder)
+- Lowest Common Ancestor
+- Depth calculation

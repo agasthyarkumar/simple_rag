@@ -1,0 +1,27 @@
+Sorting algorithms arrange elements in a specific order.
+
+Common algorithms:
+
+1. Bubble Sort:
+- Repeatedly swaps adjacent elements
+- Time: O(n^2)
+- Simple but inefficient
+
+2. Merge Sort:
+- Divide and conquer
+- Time: O(n log n)
+- Stable sort
+
+3. Quick Sort:
+- Picks a pivot and partitions array
+- Average: O(n log n)
+- Worst: O(n^2)
+
+4. Heap Sort:
+- Uses binary heap
+- Time: O(n log n)
+
+Key Concepts:
+- Stability
+- In-place sorting
+- Time vs space trade-offs
