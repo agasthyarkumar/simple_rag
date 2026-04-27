@@ -292,6 +292,27 @@ body {
   margin-top: 1px;
 }
 
+.source-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.source-file {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid #BFDBFE;
+  border-radius: 4px;
+  padding: 1px 7px;
+  display: inline-block;
+  width: fit-content;
+  letter-spacing: 0.2px;
+}
+
 .source-card p {
   font-size: 0.8rem;
   color: var(--text-2);

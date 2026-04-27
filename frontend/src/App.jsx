@@ -21,20 +21,23 @@ async function askQuestion(question) {
   return res.json();
 }
 
-function SourceChunks({ chunks }) {
-  const [open, setOpen] = useState(false);
+function SourceChunks({ chunks, sources = [] }) {
+  const [open, setOpen] = useState(true);
   return (
     <div className="sources">
       <button className="sources-toggle" onClick={() => setOpen((o) => !o)}>
         <span className="sources-icon">{open ? "▾" : "▸"}</span>
-        {open ? "Hide" : "View"} {chunks.length} source{chunks.length > 1 ? "s" : ""}
+        {open ? "Hide" : "Show"} {chunks.length} retrieved chunk{chunks.length > 1 ? "s" : ""}
       </button>
       {open && (
         <div className="sources-list">
           {chunks.map((c, i) => (
             <div key={i} className="source-card">
               <span className="source-num">{i + 1}</span>
-              <p>{c}</p>
+              <div className="source-content">
+                {sources[i] && <span className="source-file">{sources[i]}</span>}
+                <p>{c}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -56,7 +59,7 @@ function Message({ msg }) {
       )}
       <div className="msg-body">
         <div className="bubble">{msg.text}</div>
-        {!isUser && msg.context?.length > 0 && <SourceChunks chunks={msg.context} />}
+        {!isUser && msg.context?.length > 0 && <SourceChunks chunks={msg.context} sources={msg.sources} />}
       </div>
     </div>
   );
@@ -105,7 +108,7 @@ export default function App() {
       const data = await askQuestion(question);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: data.answer, context: data.context },
+        { role: "assistant", text: data.answer, context: data.context, sources: data.sources ?? [] },
       ]);
     } catch (e) {
       setError(e.message);

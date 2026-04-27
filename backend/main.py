@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 import rag
 import llm_provider
-from config import API_TOKEN, RATE_LIMIT
+from config import API_TOKEN, RATE_LIMIT, INDEX_TYPE, VECTOR_DB, EMBEDDING_MODEL
 
 # ── rate-limit state (in-memory, per IP) ────────────────────────────────────
 _rate_limit_count = int(RATE_LIMIT.split("/")[0])  # e.g. 5
@@ -57,13 +57,25 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     answer: str
-    context: list[str]
+    context: list[str]        # plain text chunks (unchanged, backward-compatible)
+    sources: list[str] = []   # source filename for each chunk (parallel to context)
 
 
 # ── endpoints ─────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
     return {"status": "ok", "chunks_indexed": len(rag._chunks)}
+
+
+@app.get("/index-info")
+async def index_info():
+    """Return metadata about the active retrieval configuration."""
+    return {
+        "index_type": INDEX_TYPE,
+        "vector_db": VECTOR_DB,
+        "embedding_model": EMBEDDING_MODEL,
+        "chunks_indexed": len(rag._chunks),
+    }
 
 
 @app.post("/query", response_model=QueryResponse)
@@ -78,8 +90,11 @@ async def query(
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-    chunks = rag.retrieve(req.question)
+    hits = rag.retrieve_with_metadata(req.question)
+    chunks = [h["text"] for h in hits]
+    sources = [h["source"] for h in hits]
+
     prompt = rag.build_prompt(req.question, chunks)
     answer = await llm_provider.call_llm(prompt)
 
-    return QueryResponse(answer=answer, context=chunks)
+    return QueryResponse(answer=answer, context=chunks, sources=sources)
