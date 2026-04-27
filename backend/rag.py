@@ -196,32 +196,36 @@ def build_index() -> None:
     _save_faiss_index()
 
 
-def retrieve_with_metadata(query: str) -> list[dict]:
-    """Return top-k chunks as [{"text": str, "source": str}]."""
-    if not query.strip():
-        return []
+def encode_query(query: str) -> np.ndarray:
+    """Encode and normalize a single query string. Returns shape (1, dim)."""
+    return _encode([query])
 
-    t0 = time.perf_counter()
-    q_vec = _encode([query])
 
+def search_encoded(q_vec: np.ndarray) -> list[dict]:
+    """Search the active index with a pre-encoded query vector."""
     if VECTOR_DB == "qdrant":
-        hits = _retrieve_qdrant(q_vec)
-        logger.info(f"Qdrant retrieval | chunks={len(hits)} | {time.perf_counter()-t0:.3f}s")
-        return hits
+        return _retrieve_qdrant(q_vec)
 
     if _index is None:
         raise RuntimeError("Index not built. Call build_index() first.")
 
-    # Set search-time accuracy parameters
-    if hasattr(_index, "nprobe"):          # IVFFlat: cells to visit per query
+    if hasattr(_index, "nprobe"):
         _index.nprobe = min(10, _index.nlist)
-    if hasattr(_index, "hnsw"):            # HNSWFlat: beam width during search
+    if hasattr(_index, "hnsw"):
         _index.hnsw.efSearch = 128
 
     k = min(TOP_K, _index.ntotal)
     _, indices = _index.search(q_vec, k)
-    hits = [_chunks[i] for i in indices[0] if 0 <= i < len(_chunks)]
-    logger.info(f"FAISS ({INDEX_TYPE}) retrieval | chunks={len(hits)} | {time.perf_counter()-t0:.3f}s")
+    return [_chunks[i] for i in indices[0] if 0 <= i < len(_chunks)]
+
+
+def retrieve_with_metadata(query: str) -> list[dict]:
+    """Return top-k chunks as [{"text": str, "source": str}]."""
+    if not query.strip():
+        return []
+    t0 = time.perf_counter()
+    hits = search_encoded(encode_query(query))
+    logger.info(f"Retrieval | chunks={len(hits)} | {time.perf_counter()-t0:.3f}s")
     return hits
 
 
