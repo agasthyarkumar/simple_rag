@@ -126,7 +126,22 @@ def _build_qdrant_index(vectors: np.ndarray) -> None:
     from qdrant_client.models import Distance, VectorParams, PointStruct
     from config import QDRANT_URL, QDRANT_COLLECTION
 
-    _qdrant_client = QdrantClient(url=QDRANT_URL)
+    # Retry a few times — Qdrant may still be starting up
+    client = QdrantClient(url=QDRANT_URL)
+    for attempt in range(1, 6):
+        try:
+            client.get_collections()   # lightweight connectivity check
+            break
+        except Exception as exc:
+            if attempt == 5:
+                raise RuntimeError(
+                    f"Cannot reach Qdrant at {QDRANT_URL} after {attempt} attempts. "
+                    "Start it with: docker run -d --name qdrant -p 6333:6333 qdrant/qdrant"
+                ) from exc
+            logger.warning(f"Qdrant not ready (attempt {attempt}/5): {exc} — retrying in 2s…")
+            time.sleep(2)
+
+    _qdrant_client = client
     dim = vectors.shape[1]
 
     _qdrant_client.recreate_collection(

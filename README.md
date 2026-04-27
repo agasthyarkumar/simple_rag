@@ -158,13 +158,7 @@ Builds a hierarchical navigable small-world graph. Traverses the graph to find a
 
 Qdrant is a purpose-built vector database. Use it when you want persistence, filtering, or a production-grade search backend.
 
-### 1. Start Qdrant via Docker
-
-```bash
-docker run -d --name qdrant -p 6333:6333 qdrant/qdrant
-```
-
-### 2. Update `.env`
+### 1. Update `.env`
 
 ```env
 VECTOR_DB=qdrant
@@ -172,13 +166,21 @@ QDRANT_URL=http://localhost:6333
 QDRANT_COLLECTION=rag_docs
 ```
 
-### 3. Restart the backend
+### 2. Restart with `./start`
 
 ```bash
-cd backend && uvicorn main:app --reload
+./start
 ```
 
-On startup the backend uploads all chunk vectors to Qdrant. Retrieval from that point uses Qdrant's cosine-similarity search. The header badge in the UI will show `flat · qdrant · N chunks`.
+The start script detects `VECTOR_DB=qdrant` in your `.env` and automatically starts (or restarts) the Qdrant Docker container before launching the backend. On first run it pulls the image; subsequent runs just call `docker start qdrant`.
+
+If Docker is unavailable, start Qdrant manually first:
+
+```bash
+docker run -d --name qdrant -p 6333:6333 qdrant/qdrant
+```
+
+On startup the backend retries the Qdrant connection up to 5 times (2 s apart), then uploads all chunk vectors. The header badge will show `flat · qdrant · N chunks`.
 
 ### Switching back to FAISS
 
