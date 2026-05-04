@@ -23,6 +23,10 @@ export default defineConfig(() => {
           changeOrigin: true,
           headers: authHeader,
         },
+        "/index-info": {
+          target: "http://localhost:8000",
+          changeOrigin: true,
+        },
       },
     },
   };

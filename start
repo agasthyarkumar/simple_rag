@@ -8,6 +8,22 @@ pip install -r "$ROOT/backend/requirements.txt"
 echo "==> Installing frontend dependencies..."
 (cd "$ROOT/frontend" && npm install)
 
+# ── Qdrant (only when VECTOR_DB=qdrant) ──────────────────────────────────────
+VECTOR_DB_VAL=$(grep -E '^VECTOR_DB=' "$ROOT/.env" 2>/dev/null | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs)
+if [ "$VECTOR_DB_VAL" = "qdrant" ]; then
+  if ! docker info >/dev/null 2>&1; then
+    echo "WARNING: Docker not available — skipping Qdrant startup"
+  elif docker ps --filter name=qdrant --filter status=running -q | grep -q .; then
+    echo "==> Qdrant already running"
+  elif docker ps -a --filter name=qdrant -q | grep -q .; then
+    echo "==> Starting existing Qdrant container..."
+    docker start qdrant
+  else
+    echo "==> Starting Qdrant (first run — pulling image)..."
+    docker run -d --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
+  fi
+fi
+
 echo ""
 echo "==> Starting backend  → http://localhost:8000"
 echo "==> Starting frontend → http://localhost:5173"

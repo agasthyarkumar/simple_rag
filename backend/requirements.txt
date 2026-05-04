@@ -6,3 +6,5 @@ numpy==1.26.4
 groq==0.13.1
 python-dotenv==1.0.1
 pydantic==2.10.3
+# Optional: only needed when VECTOR_DB=qdrant
+qdrant-client==1.12.1
